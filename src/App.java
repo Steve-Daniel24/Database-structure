@@ -119,19 +119,22 @@ public class App {
 
         CEN.insert(L1CEN, L2CEN, L3CEN, L4CEN, L5CEN, L6CEN, L7CEN);
 
-        // Relation jointureResult = r1.jointure(r2);
+        // Relation jointureResult = CJH.jointure(r2);
         // ArrayList<Uplet> result = jointureResult.projection(jointureResult.getNuplets(), jointureResult, "X");
         // jointureResult.display(result);
-        
-        ArrayList<Uplet> selectResult = CS.selection("IdSalle", "=","S1");
-        CS.display(selectResult);
+       
+        // ArrayList<Uplet> jointure = CJH.jointure("idCours", "=", CS, "idCours");
+        // CJH.display(jointure); 
+
+        // ArrayList<Uplet> selectResult = CS.selection("IdSalle", "=","S1");
+        // CS.display(selectResult);
 
         // ArrayList<Uplet> projectResult = CS.projection("IdSalle");
         // CS.display(projectResult);
         
-        CEN.display(CEN.getNuplets());
-        ArrayList<Uplet> cenSelection = CEN.selection("IdEtudiants", "=", "300");
-        CEN.display(cenSelection);
+        // CEN.display(CEN.getNuplets());
+        // ArrayList<Uplet> cenSelection = CEN.selection("IdEtudiants", "=", "300");
+        // CEN.display(cenSelection);
 
         // CJH.display(CJH.getNuplets());
 
@@ -141,10 +144,8 @@ public class App {
 
         // ENA.display(ENA.getNuplets());
 
-        // CJH.display(jointureResult);
 
     }
 }
-
 
 //Le selection tsy mandeha : Tsy afaka micaste

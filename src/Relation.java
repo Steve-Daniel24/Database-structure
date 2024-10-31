@@ -5,7 +5,7 @@ public class Relation {
     ArrayList<Attribut> listColonne;
     ArrayList<Uplet> nUplet;
 
-    //La liste des colonnes a afficher dans display
+    // La liste des colonnes a afficher dans display
     String[] listColonneAfficher = new String[0];
 
     public Relation(String name, Attribut... col) {
@@ -38,7 +38,7 @@ public class Relation {
     public ArrayList<Uplet> projection(String... nomColonne) {
         ArrayList<Uplet> result = new ArrayList<>();
         ArrayList<Uplet> nUplet = this.getNuplets();
-        
+
         for (int i = 0; i < nomColonne.length; i++) {
             listColonneAfficher[i] = nomColonne[i];
         }
@@ -55,7 +55,7 @@ public class Relation {
             }
 
             listColonneAfficher = new String[listColonne.size()];
-            
+
             for (int i = 0; i < listColonne.size(); i++) {
                 listColonneAfficher[i] = listColonne.get(i).getNomAttribut();
             }
@@ -165,7 +165,7 @@ public class Relation {
     }
 
     public Relation produitCartesien(Relation r2) {
-        //Initialiser les colonnes de la nouvelle relation
+        // Initialiser les colonnes de la nouvelle relation
         Relation resultRelation = new Relation("resultcartesian", this.listColonne.toArray(new Attribut[0]));
         resultRelation.appendColumns(r2.getListColonne().toArray(new Attribut[0]));
 
@@ -185,14 +185,17 @@ public class Relation {
         return resultRelation;
     }
 
-    //Le nom de la colonne a appliquer la jointure, l'operateur, la deuxieme relation et le nom de la colonne
+    // Le nom de la colonne a appliquer la jointure, l'operateur, la deuxieme relation et le nom de la colonne
     public ArrayList<Uplet> jointure(String nomColonneUn, String Operateur, Relation r2, String nomColonneDeux) {
         Relation pCartesien = this.produitCartesien(r2);
         ArrayList<Uplet> result = new ArrayList<>();
 
+        int indexColonneUn = pCartesien.getIndexOfColumn(nomColonneUn);
+        int indexColonneDeux = pCartesien.getIndexOfColumn(nomColonneDeux) + this.listColonne.size();
+
         for (Uplet uplet : pCartesien.getNuplets()) {
-            Object valeurUn = uplet.getValeur(nomColonneUn, pCartesien);
-            Object valeurDeux = uplet.getValeur(nomColonneDeux, pCartesien);
+            Object valeurUn = uplet.getValeur(indexColonneUn);
+            Object valeurDeux = uplet.getValeur(indexColonneDeux);
 
             if (applyOperator(valeurUn, Operateur, valeurDeux.toString())) {
                 result.add(uplet);
@@ -210,6 +213,15 @@ public class Relation {
         index = 0;
 
         return result;
+    }
+
+    public int getIndexOfColumn(String nomColonne) {
+        for (int i = 0; i < listColonne.size(); i++) {
+            if (listColonne.get(i).getNomAttribut().equalsIgnoreCase(nomColonne)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Colonne non trouvée : " + nomColonne);
     }
 
     private boolean applyOperator(Object value, String Operateur, String key) {
@@ -239,18 +251,17 @@ public class Relation {
 
     public void display(ArrayList<Uplet> nUplet) {
 
-        if(listColonneAfficher.length == 0) {
+        if (listColonneAfficher.length == 0) {
             for (Attribut colonne : listColonne) {
                 String nomColonne = colonne.getNomAttribut();
                 System.out.printf("| %-12s ", nomColonne);
             }
             System.out.print("|");
-        }
-        else {
+        } else {
             for (int i = 0; i < listColonneAfficher.length; i++) {
                 System.out.printf("| %-12s ", listColonneAfficher[i]);
             }
-    
+
             System.out.print("|");
         }
 
