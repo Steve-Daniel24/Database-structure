@@ -1,18 +1,25 @@
-## Getting Started
+## Description:
+This Java project implements a simple Course Management System, simulating basic database functionalities such as relations and tuples. It allows you to manage courses, students, and their associated details through a series of classes representing domains, attributes, and relations.
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Features:
+Domain and Attribute Definition: Define various data types (e.g., Varchar, Number) and their associated attributes.
 
-## Folder Structure
+- Relation Management: Create multiple relations representing entities such as courses, classrooms, and students.
 
-The workspace contains two folders by default, where:
+- Tuple Insertion: Insert tuples (records) into the relations.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+- Selection and Projection Operations: Perform selection queries to filter tuples based on specific conditions, and project attributes from relations.
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+- Data Display: Display tuples for each relation, providing an overview of the current state of the data.
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+## Structure: 
+An outline of the main classes and components.
 
-## Dependency Management
+## Usage: 
+Instructions on how to run or use the project.
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## Requirements: 
+- Java Development Kit (JDK)
+
+## Contributions: 
+Feel free to fork the repository and contribute by adding features or improving existing functionalities!
