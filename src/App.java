@@ -80,7 +80,7 @@ public class App {
 
         Attribut Note = new Attribut("IdSalle", varchar);
         // Quatrième relation
-        Relation CEN = new Relation("CEN", IdCours, IdEtudiants , Note);
+        Relation CEN = new Relation("CEN", IdCours, IdEtudiants, Note);
 
         Uplet L1CEN = new Uplet(CEN);
         L1CEN.setValeur(0, "Archi");
@@ -119,19 +119,15 @@ public class App {
 
         CEN.insert(L1CEN, L2CEN, L3CEN, L4CEN, L5CEN, L6CEN, L7CEN);
 
-        // Relation jointureResult = CJH.jointure(r2);
-        // ArrayList<Uplet> result = jointureResult.projection(jointureResult.getNuplets(), jointureResult, "X");
-        // jointureResult.display(result);
-       
         // ArrayList<Uplet> jointure = CJH.jointure("idCours", "=", CS, "idCours");
-        // CJH.display(jointure); 
+        // CJH.display(jointure);
 
         // ArrayList<Uplet> selectResult = CS.selection("IdSalle", "=","S1");
         // CS.display(selectResult);
 
         // ArrayList<Uplet> projectResult = CS.projection("IdSalle");
         // CS.display(projectResult);
-        
+
         // CEN.display(CEN.getNuplets());
         // ArrayList<Uplet> cenSelection = CEN.selection("IdEtudiants", "=", "300");
         // CEN.display(cenSelection);
@@ -144,8 +140,50 @@ public class App {
 
         // ENA.display(ENA.getNuplets());
 
+        //////////////////////////
 
+        // Créer des attributs
+        Attribut a1 = new Attribut("ID", varchar);
+        Attribut a2 = new Attribut("Nom", varchar);
+        Attribut a3 = new Attribut("Age", varchar);
+
+        // Créer une relation
+        Relation relation1 = new Relation("Personnes", a1, a2, a3);
+
+        // Insérer des données (uplets)
+        Uplet uplet1 = new Uplet(relation1);
+        uplet1.setValeur(0, "1");
+        uplet1.setValeur(1, "2");
+        uplet1.setValeur(2, "3");
+
+        Uplet uplet2 = new Uplet(relation1);
+        uplet2.setValeur(0, "4");
+        uplet2.setValeur(1, "5");
+        uplet2.setValeur(2, "6");
+
+        relation1.insert(uplet1, uplet2);
+
+        Relation relation2 = new Relation("Personnes", a1, a2, a3);
+        Uplet uplet3 = new Uplet(relation2);
+        uplet3.setValeur(0, "7");
+        uplet3.setValeur(1, "8");
+        uplet3.setValeur(2, "9");
+        relation2.insert(uplet3);
+
+        Uplet uplet4 = new Uplet(relation2);
+        uplet4.setValeur(0, "4");
+        uplet4.setValeur(1, "5");
+        uplet4.setValeur(2, "6");
+        relation2.insert(uplet4);
+
+        System.out.println("Union des deux relations :");
+        ArrayList<Uplet> unionResult = relation1.intersection(relation2);
+
+        ArrayList<Uplet> differenceResult = relation1.intersection(relation2);
+
+        ArrayList<Uplet> intersectionResult = relation1.intersection(relation2);
+
+        relation1.display(unionResult);
     }
 }
 
-//Le selection tsy mandeha : Tsy afaka micaste

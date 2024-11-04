@@ -150,6 +150,7 @@ public class Relation {
 
         for (Uplet uplet1 : this.nUplet) {
             boolean found = false;
+            
             for (Uplet uplet2 : r2.getNuplets()) {
                 if (uplet1.equals(uplet2)) {
                     found = true;
