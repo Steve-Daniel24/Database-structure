@@ -86,6 +86,8 @@ public class Relation {
     }
 
     public ArrayList<Uplet> selection(String nomColonne, String Operateur, String key) {
+        Relation selecRelation = new Relation("selectRelation", null);
+        
         ArrayList<Uplet> result = new ArrayList<>();
         listColonneAfficher = new String[listColonne.size()];
 
