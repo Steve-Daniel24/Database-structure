@@ -1,12 +1,9 @@
-import java.util.ArrayList;
+import java.util.*;
 
 public class Relation {
-    String name;
-    ArrayList<Attribut> listColonne;
-    ArrayList<Uplet> nUplet;
-
-    // La liste des colonnes a afficher dans display
-    String[] listColonneAfficher = new String[0];
+    private String name;
+    private ArrayList<Attribut> listColonne;
+    private ArrayList<Uplet> nUplet;
 
     public Relation(String name, Attribut... col) {
         this.name = name;
@@ -16,126 +13,218 @@ public class Relation {
     }
 
     public void appendColumns(Attribut... col) {
-        for (Attribut c : col) {
-            listColonne.add(c);
-        }
+        Collections.addAll(listColonne, col);
     }
 
     public void insert(Uplet... ligne) {
-        for (Uplet uplet : ligne) {
-            nUplet.add(uplet);
-        }
+        Collections.addAll(nUplet, ligne);
+    }
+
+    public void setListColonne(ArrayList<Attribut> listColonneadd) {
+        listColonne = listColonneadd;
+    }
+
+    public void setNupplet(ArrayList<Uplet> listUpletsadd) {
+        nUplet = listUpletsadd;
+    }
+
+    public ArrayList<Uplet> getNupplet() {
+        return nUplet;
     }
 
     public ArrayList<Attribut> getListColonne() {
         return listColonne;
     }
 
-    public ArrayList<Uplet> getNuplets() {
-        return nUplet;
-    }
+    public Relation projection(String... nomColonne) {
+        List<Attribut> newColumns = new ArrayList<>();
 
-    public ArrayList<Uplet> projection(String... nomColonne) {
-        ArrayList<Uplet> result = new ArrayList<>();
-        ArrayList<Uplet> nUplet = this.getNuplets();
-
-        for (int i = 0; i < nomColonne.length; i++) {
-            listColonneAfficher[i] = nomColonne[i];
+        for (String colonne : nomColonne) {
+            int index = getIndexOfColumn(colonne);
+            newColumns.add(listColonne.get(index));
         }
 
-        if (nomColonne.length == 1 && nomColonne[0].equals("*")) {
-            for (Uplet uplet : nUplet) {
-                Uplet projectedUplet = new Uplet(this);
+        Relation newRelation = new Relation(this.name + "_Projection", newColumns.toArray(new Attribut[0]));
 
-                for (int i = 0; i < uplet.getLigne().size(); i++) {
-                    projectedUplet.setValeur(i, uplet.getValeur(i));
+        for (Uplet uplet : nUplet) {
+            Uplet newUplet = new Uplet(newRelation);
+
+            for (int i = 0; i < nomColonne.length; i++) {
+                int index = getIndexOfColumn(nomColonne[i]);
+                newUplet.setValeur(i, uplet.getValeur(index));
+            }
+
+            newRelation.insert(newUplet);
+        }
+
+        return newRelation;
+    }
+
+    public Relation selection(String condition) {
+        ArrayList<Uplet> selectedUplets = new ArrayList<>();
+
+        // Zaraina par 'or'
+        String[] orConditions = condition.split(" or ");
+
+        for (Uplet uplet : nUplet) {
+            boolean orMatch = false;
+
+            for (String orCond : orConditions) {
+                // System.out.println("orcond : " + orCond);
+
+                // Zaraina par 'and'
+                String[] andConditions = orCond.trim().split(" and ");
+                boolean andMatch = true;
+
+                for (String andCond : andConditions) {
+                    andCond = andCond.trim().replaceAll("[()]", "");
+
+                    String[] parts = andCond.split(" ");
+
+                    String nomColonne = parts[0];
+                    String operateur = parts[1];
+                    String valeur = parts[2].replaceAll("'", "");
+
+                    if (!applyCondition(uplet, nomColonne, operateur, valeur)) {
+                        andMatch = false;
+                        break;
+                    }
                 }
 
-                result.add(projectedUplet);
-            }
-
-            listColonneAfficher = new String[listColonne.size()];
-
-            for (int i = 0; i < listColonne.size(); i++) {
-                listColonneAfficher[i] = listColonne.get(i).getNomAttribut();
-            }
-
-        } else {
-            int i = 0;
-
-            for (Uplet u : nUplet) {
-                Uplet projectedUplet = new Uplet(this);
-
-                for (String colonne : nomColonne) {
-                    projectedUplet.setValeur(i++, u.getValeur(colonne, this));
+                if (andMatch) {
+                    orMatch = true;
+                    break;
                 }
-
-                i = 0;
-
-                result.add(projectedUplet);
             }
 
-            listColonneAfficher = new String[nomColonne.length];
-
-            for (int j = 0; j < nomColonne.length; j++) {
-                listColonneAfficher[j] = nomColonne[j];
+            if (orMatch) {
+                selectedUplets.add(uplet);
             }
         }
 
-        return result;
+        Relation selectedRelation = new Relation(this.name);
+
+        ArrayList<Attribut> selectedListColonne = new ArrayList<>();
+        for (Attribut colonne : this.listColonne) {
+            Attribut newColonne = new Attribut(colonne.getNomAttribut(), colonne.getDomaine());
+            selectedListColonne.add(newColonne);
+        }
+
+        selectedRelation.setListColonne(selectedListColonne);
+        selectedRelation.setNupplet(selectedUplets);
+
+        return selectedRelation;
     }
 
-    public ArrayList<Uplet> selection(String nomColonne, String Operateur, String key) {
-        Relation selecRelation = new Relation("selectRelation", null);
-        
-        ArrayList<Uplet> result = new ArrayList<>();
-        listColonneAfficher = new String[listColonne.size()];
+    private boolean applyCondition(Uplet uplet, String nomColonne, String operateur, String valeur) {
+
+        int index = getIndexOfColumn(nomColonne);
+
+        Object upletValue = uplet.getValeur(index);
+
+        switch (operateur) {
+            case "=":
+                return upletValue.toString().equals(valeur);
+            case "!=":
+                return !upletValue.toString().equals(valeur);
+            case "<":
+                return Integer.parseInt(upletValue.toString()) < Integer.parseInt(valeur);
+            case ">":
+                return Integer.parseInt(upletValue.toString()) > Integer.parseInt(valeur);
+            case "<=":
+                return Integer.parseInt(upletValue.toString()) <= Integer.parseInt(valeur);
+            case ">=":
+                return Integer.parseInt(upletValue.toString()) >= Integer.parseInt(valeur);
+            default:
+                throw new IllegalArgumentException("Unsupported operator: " + operateur);
+        }
+    }
+
+    private int getIndexOfColumn(String nomColonne) {
+        for (int i = 0; i < listColonne.size(); i++) {
+            if (listColonne.get(i).getNomAttribut().equalsIgnoreCase(nomColonne)) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("Colonne non trouvée : " + nomColonne);
+    }
+
+    public Relation union(Relation r2) {
+        if (this.listColonne.size() != r2.getListColonne().size()) {
+            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes.");
+        }
+
+        ArrayList<Attribut> newColumns = new ArrayList<>();
 
         for (int i = 0; i < listColonne.size(); i++) {
-            listColonneAfficher[i] = listColonne.get(i).getNomAttribut();
+            Attribut col1 = this.listColonne.get(i);
+            Attribut col2 = r2.getListColonne().get(i);
+
+            Domaine newDomaine = new Domaine(new ArrayList<>(col1.getDomaine().getValeursPermises()));
+
+            for (Object value : col2.getDomaine().getValeursPermises()) {
+                if (!newDomaine.getValeursPermises().contains(value)) {
+                    newDomaine.ajouterValeurPermise(value);
+                }
+            }
+
+            Attribut newCol = new Attribut(col1.getNomAttribut(), newDomaine);
+            newColumns.add(newCol);
         }
 
-        for (Uplet u : nUplet) {
-            if (applyOperator(u.getValeur(nomColonne, this), Operateur, key)) {
-                result.add(u);
+        Relation result = new Relation("Union", newColumns.toArray(new Attribut[0]));
+
+        for (Uplet uplet1 : this.nUplet) {
+            Uplet newUplet = new Uplet(result);
+            for (int i = 0; i < uplet1.getLigne().size(); i++) {
+                newUplet.setValeur(i, uplet1.getValeur(i));
             }
+            result.insert(newUplet);
+        }
+
+        for (Uplet uplet2 : r2.getNuplets()) {
+            Uplet newUplet = new Uplet(result);
+            for (int i = 0; i < uplet2.getLigne().size(); i++) {
+                newUplet.setValeur(i, uplet2.getValeur(i));
+            }
+            result.insert(newUplet);
         }
 
         return result;
     }
 
-    public ArrayList<Uplet> Union(Relation r2) {
-        ArrayList<Uplet> result = new ArrayList<>();
-
-        if (!this.listColonne.equals(r2.getListColonne())) {
-            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes");
+    public Relation intersection(Relation r2) {
+        if (this.listColonne.size() != r2.getListColonne().size()) {
+            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes.");
         }
 
-        for (Uplet uplet : this.nUplet) {
-            result.add(uplet);
-        }
+        ArrayList<Attribut> newColumns = new ArrayList<>();
+        for (int i = 0; i < listColonne.size(); i++) {
+            Attribut col1 = this.listColonne.get(i);
+            Attribut col2 = r2.getListColonne().get(i);
 
-        for (Uplet uplet : r2.getNuplets()) {
-            if (!result.contains(uplet)) {
-                result.add(uplet);
+            Domaine newDomaine = new Domaine(new ArrayList<>());
+            for (Object value : col1.getDomaine().getValeursPermises()) {
+                if (col2.getDomaine().getValeursPermises().contains(value)) {
+                    newDomaine.ajouterValeurPermise(value);
+                }
             }
+
+            Attribut newCol = new Attribut(col1.getNomAttribut(), newDomaine);
+            newColumns.add(newCol);
         }
 
-        return result;
-    }
-
-    public ArrayList<Uplet> intersection(Relation r2) {
-        ArrayList<Uplet> result = new ArrayList<>();
-
-        if (!this.listColonne.equals(r2.getListColonne())) {
-            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes");
-        }
+        Relation result = new Relation("Intersection", newColumns.toArray(new Attribut[0]));
 
         for (Uplet uplet1 : this.nUplet) {
             for (Uplet uplet2 : r2.getNuplets()) {
                 if (uplet1.equals(uplet2)) {
-                    result.add(uplet1);
-                    break;
+                    Uplet newUplet = new Uplet(result);
+                    for (int i = 0; i < uplet1.getLigne().size(); i++) {
+                        newUplet.setValeur(i, uplet1.getValeur(i));
+                    }
+                    result.insert(newUplet);
                 }
             }
         }
@@ -143,24 +232,29 @@ public class Relation {
         return result;
     }
 
-    public ArrayList<Uplet> difference(Relation r2) {
-        ArrayList<Uplet> result = new ArrayList<>();
-
-        if (!this.listColonne.equals(r2.getListColonne())) {
-            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes");
+    public Relation difference(Relation r2) {
+        if (this.listColonne.size() != r2.getListColonne().size()) {
+            throw new IllegalArgumentException("Les relations n'ont pas les mêmes colonnes.");
         }
 
+        ArrayList<Attribut> newColumns = new ArrayList<>(this.listColonne);
+
+        Relation result = new Relation("Difference", newColumns.toArray(new Attribut[0]));
+
         for (Uplet uplet1 : this.nUplet) {
-            boolean found = false;
-            
+            boolean existsInSecond = false;
             for (Uplet uplet2 : r2.getNuplets()) {
                 if (uplet1.equals(uplet2)) {
-                    found = true;
+                    existsInSecond = true;
                     break;
                 }
             }
-            if (!found) {
-                result.add(uplet1);
+            if (!existsInSecond) {
+                Uplet newUplet = new Uplet(result);
+                for (int i = 0; i < uplet1.getLigne().size(); i++) {
+                    newUplet.setValeur(i, uplet1.getValeur(i));
+                }
+                result.insert(newUplet);
             }
         }
 
@@ -168,156 +262,147 @@ public class Relation {
     }
 
     public Relation produitCartesien(Relation r2) {
-        // Initialiser les colonnes de la nouvelle relation
-        Relation resultRelation = new Relation("resultcartesian", this.listColonne.toArray(new Attribut[0]));
-        resultRelation.appendColumns(r2.getListColonne().toArray(new Attribut[0]));
+        ArrayList<Attribut> newColumns = new ArrayList<>(this.listColonne);
+        newColumns.addAll(r2.getListColonne());
+
+        Relation newRelation = new Relation(this.name + "_ProduitCartesien", newColumns.toArray(new Attribut[0]));
 
         for (Uplet uplet1 : this.nUplet) {
             for (Uplet uplet2 : r2.getNuplets()) {
-                Uplet combinedUplet = new Uplet(resultRelation);
-                for (int i = 0; i < uplet1.getLigne().size(); i++) {
-                    combinedUplet.setValeur(i, uplet1.getValeur(i));
+                Uplet combinedUplet = new Uplet(newRelation);
+
+                int index = 0;
+                for (Object value : uplet1.getLigne()) {
+                    combinedUplet.setValeur(index++, value);
                 }
-                for (int i = 0; i < uplet2.getLigne().size(); i++) {
-                    combinedUplet.setValeur(i + uplet1.getLigne().size(), uplet2.getValeur(i));
+                for (Object value : uplet2.getLigne()) {
+                    combinedUplet.setValeur(index++, value);
                 }
-                resultRelation.insert(combinedUplet);
+
+                newRelation.insert(combinedUplet);
             }
         }
 
-        return resultRelation;
+        return newRelation;
     }
 
-    // Le nom de la colonne a appliquer la jointure, l'operateur, la deuxieme relation et le nom de la colonne
-    public ArrayList<Uplet> jointure(String nomColonneUn, String Operateur, Relation r2, String nomColonneDeux) {
-        Relation pCartesien = this.produitCartesien(r2);
-        ArrayList<Uplet> result = new ArrayList<>();
-
-        int indexColonneUn = pCartesien.getIndexOfColumn(nomColonneUn);
-        int indexColonneDeux = pCartesien.getIndexOfColumn(nomColonneDeux) + this.listColonne.size();
-
-        for (Uplet uplet : pCartesien.getNuplets()) {
-            Object valeurUn = uplet.getValeur(indexColonneUn);
-            Object valeurDeux = uplet.getValeur(indexColonneDeux);
-
-            if (applyOperator(valeurUn, Operateur, valeurDeux.toString())) {
-                result.add(uplet);
+    public Relation jointure(Relation autreRelation, String colonne1, String operateur, String colonne2) {
+        int indexColonne1 = this.getIndexOfColumn(colonne1);
+        int indexColonne2 = autreRelation.getIndexOfColumn(colonne2);
+    
+        ArrayList<Attribut> nouvellesColonnes = new ArrayList<>(this.listColonne);
+        for (Attribut attr : autreRelation.getListColonne()) {
+            if (!nouvellesColonnes.contains(attr)) {
+                nouvellesColonnes.add(attr);
             }
         }
-
-        listColonneAfficher = new String[pCartesien.getListColonne().size()];
-        int index = 0;
-
-        for (Attribut attribut : pCartesien.getListColonne()) {
-            listColonneAfficher[index] = attribut.getNomAttribut();
-            index++;
-        }
-
-        index = 0;
-
-        return result;
-    }
-
-    public int getIndexOfColumn(String nomColonne) {
-        for (int i = 0; i < listColonne.size(); i++) {
-            if (listColonne.get(i).getNomAttribut().equalsIgnoreCase(nomColonne)) {
-                return i;
+    
+        Relation nouvelleRelation = new Relation(this.name + "_join_" + autreRelation.name, 
+                                                 nouvellesColonnes.toArray(new Attribut[0]));
+    
+        for (Uplet uplet1 : this.nUplet) {
+            for (Uplet uplet2 : autreRelation.getNuplets()) {
+                if (applyConditionDirect(uplet1.getValeur(indexColonne1), 
+                                          operateur, 
+                                          uplet2.getValeur(indexColonne2))) {
+                    Uplet nouveauUplet = combinerUplets(uplet1, uplet2, indexColonne2, nouvelleRelation);
+                    nouvelleRelation.insert(nouveauUplet);
+                }
             }
         }
-        throw new IllegalArgumentException("Colonne non trouvée : " + nomColonne);
+    
+        return nouvelleRelation;
     }
-
-    private boolean applyOperator(Object value, String Operateur, String key) {
-
-        switch (Operateur) {
+    
+    private boolean applyConditionDirect(Object valeur1, String operateur, Object valeur2) {
+        switch (operateur) {
             case "=":
-                return value.toString().equals(key);
+                return valeur1.equals(valeur2);
             case "!=":
-                return !value.toString().equals(key);
+                return !valeur1.equals(valeur2);
             case "<":
-                int i = Integer.parseInt(key);
-                return (int) value < i;
+                return Integer.parseInt(valeur1.toString()) < Integer.parseInt(valeur2.toString());
             case ">":
-                int n = Integer.parseInt(key);
-                return (int) value > n;
+                return Integer.parseInt(valeur1.toString()) > Integer.parseInt(valeur2.toString());
             case "<=":
-                int t = Integer.parseInt(key);
-                int k = (int) value;
-                return k <= t;
+                return Integer.parseInt(valeur1.toString()) <= Integer.parseInt(valeur2.toString());
             case ">=":
-                int K = Integer.parseInt(key);
-                return (int) value >= K;
+                return Integer.parseInt(valeur1.toString()) >= Integer.parseInt(valeur2.toString());
             default:
-                throw new IllegalArgumentException("Unsupported operator: " + Operateur);
+                throw new IllegalArgumentException("Unsupported operator: " + operateur);
         }
     }
-
-    public void display(ArrayList<Uplet> nUplet) {
-
-        if (listColonneAfficher.length == 0) {
-            for (Attribut colonne : listColonne) {
-                String nomColonne = colonne.getNomAttribut();
-                System.out.printf("| %-12s ", nomColonne);
-            }
-            System.out.print("|");
-        } else {
-            for (int i = 0; i < listColonneAfficher.length; i++) {
-                System.out.printf("| %-12s ", listColonneAfficher[i]);
-            }
-
-            System.out.print("|");
+    
+    private Uplet combinerUplets(Uplet uplet1, Uplet uplet2, int colonneIgnorée, Relation relation) {
+        Uplet nouveauUplet = new Uplet(relation);
+        int index = 0;
+    
+        for (Object val : uplet1.getLigne()) {
+            nouveauUplet.setValeur(index++, val);
         }
-
-        System.out.println("");
-
-        for (Uplet u : nUplet) {
-
-            for (int i = 0; i < u.getLigne().size(); i++) {
-                if (u.getValeur(i) == null) {
-                    continue;
-                } else {
-                    System.out.printf("| %-12s ", u.getValeur(i));
-                }
+    
+        for (int i = 0; i < uplet2.getLigne().size(); i++) {
+            if (i != colonneIgnorée) {
+                nouveauUplet.setValeur(index++, uplet2.getValeur(i));
             }
+        }
+    
+        return nouveauUplet;
+    }
+    
 
+    public ArrayList<Uplet> getNuplets() {
+        return nUplet;
+    }
+
+    public void display() {
+        for (Attribut col : listColonne) {
+            System.out.printf("| %-12s ", col.getNomAttribut());
+        }
+        System.out.println("|");
+
+        for (Uplet uplet : nUplet) {
+            for (Object value : uplet.getLigne()) {
+                System.out.printf("| %-12s ", value == null ? "NULL" : value.toString());
+            }
             System.out.println("|");
         }
-
-        System.out.println("");
     }
-
 }
 
-// public ArrayList<Uplet> projetion(String NomColonne, String key) {
-
-// // }
+// public Relation intersection(Relation r2) {
+// if (!this.listColonne.equals(r2.getListColonne())) {
+// throw new IllegalArgumentException("Les relations n'ont pas les mêmes
+// colonnes.");
 // }
 
-// Nom anle colonne ho comparena, ny comparateur de le hicomparena azy
+// Relation newRelation = new Relation(this.name + "_Intersection",
+// listColonne.toArray(new Attribut[0]));
 
-// return result;
-// }
-
-// private int compare(Object value, String key) {
-// if (value instanceof Comparable) {
-// return ((Comparable) value).compareTo(key);
-// } else {
-// throw new IllegalArgumentException("Value is not comparable: " + value);
+// for (Uplet uplet : nUplet) {
+// if (r2.getNuplets().contains(uplet)) {
+// newRelation.insert(uplet);
 // }
 // }
 
-// System.out.printf("| %-19s | %-10s | %-10s | %-10s |%n", "Empno", "Ename",
-// "Montant", "Date");
+// return newRelation;
+// }
 
-// for (Object[] empData : employeeData) {
-// System.out.printf("| %-19d | %-10s | %-10.1f | %-10s |%n",
-// empData[0], empData[1], empData[2], empData[3]);
+// // Différence : retourne une nouvelle relation
+// public Relation difference(Relation r2) {
+// if (!this.listColonne.equals(r2.getListColonne())) {
+// throw new IllegalArgumentException("Les relations n'ont pas les mêmes
+// colonnes.");
+// }
 
-// System.out.printf("| %-19d | %-10s | %-10.1f | %-10s |%n",
-// empData[0], empData[1], empData[4], empData[3]);
+// Relation newRelation = new Relation(this.name + "_Difference",
+// listColonne.toArray(new Attribut[0]));
 
-// System.out.printf("| %-19d | %-10s | %-10.1f | %-10s |%n",
-// empData[0], empData[1], (double) empData[2] * 0.01, empData[3]);
+// for (Uplet uplet : nUplet) {
+// if (!r2.getNuplets().contains(uplet)) {
+// newRelation.insert(uplet);
+// }
+// }
 
-// System.err.println("");
+// return newRelation;
 // }

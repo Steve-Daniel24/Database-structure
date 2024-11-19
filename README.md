@@ -23,3 +23,9 @@ Instructions on how to run or use the project.
 
 ## Contributions: 
 Feel free to fork the repository and contribute by adding features or improving existing functionalities!
+
+
+    //Verifiena ny clanssenle attribut eo amle index anle valeur eo amle uplet raha mitovy
+    // public Class<?> getExpectedType(int index) {
+    //     return relation.getListColonne().get(index).getTypeAttribut();
+    // }

@@ -1,19 +1,31 @@
 import java.util.*;
 
 public class Domaine {
-    String type;
-    int size;
+    private List<Object> valeursPermises;
 
-    public Domaine(String type, int size) {
-        this.type = type;
-        this.size = size;
+    public Domaine() {
+        this.valeursPermises = new ArrayList<>();
     }
 
-    public String getType() {
-        return type;
+    public Domaine(List<Object> valeursPermises) {
+        this.valeursPermises = new ArrayList<>(valeursPermises);
     }
 
-    public int getSize() {
-        return size;
+    public List<Object> getValeursPermises() {
+        return valeursPermises;
+    }
+
+    public void ajouterValeurPermise(Object valeur) {
+        if (!valeursPermises.contains(valeur)) {
+            valeursPermises.add(valeur);
+        }
+    }
+
+    public void supprimerValeurPermise(Object valeur) {
+        valeursPermises.remove(valeur);
+    }
+
+    public boolean estValeurValide(Object valeur) {
+        return valeursPermises.contains(valeur);
     }
 }
