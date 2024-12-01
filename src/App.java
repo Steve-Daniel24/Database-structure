@@ -1,4 +1,10 @@
+import mypackage.*;
 import java.util.*;
+
+import mypackage.Attribut;
+import mypackage.Domaine;
+import mypackage.Relation;
+import mypackage.Uplet;
 
 public class App {
     public static void main(String[] args) {
@@ -19,7 +25,6 @@ public class App {
         uplet1.setValeur(1, "Steve");
         uplet1.setValeur(2, 20);
 
-
         Uplet uplet2 = new Uplet(relation1);
 
         uplet1.setValeur(0, 2);
@@ -38,42 +43,41 @@ public class App {
         // System.out.println("\nAprès la sélection:");
         // selectedRelation.display();
 
-        Domaine domaineUnRelationDeux = new Domaine(Arrays.asList("John", true, 30));
-        Domaine domaineDeuxRelationDeux = new Domaine(Arrays.asList("Steve", false, 20));
+        // Domaine domaineUnRelationDeux = new Domaine(Arrays.asList("John", true, 30));
+        // Domaine domaineDeuxRelationDeux = new Domaine(Arrays.asList("Steve", false, 20));
 
-        Attribut attributNomDeux = new Attribut("Attribut1R2", domaineUnRelationDeux);
-        Attribut attributAgeDeux = new Attribut("Attribut2R2", domaineDeuxRelationDeux);
+        // Attribut attributNomDeux = new Attribut("Attribut1R2", domaineUnRelationDeux);
+        // Attribut attributAgeDeux = new Attribut("Attribut2R2", domaineDeuxRelationDeux);
 
-        Uplet uplet1 = new Uplet(relation1);
+        // Uplet uplet1 = new Uplet(relation1);
 
-        uplet1.setValeur(0, 1);
-        uplet1.setValeur(1, "Steve");
-        uplet1.setValeur(2, 20);
+        // uplet1.setValeur(0, 1);
+        // uplet1.setValeur(1, "Steve");
+        // uplet1.setValeur(2, 20);
 
-
-        Uplet uplet2 = new Uplet(relation1);
+        // Uplet uplet2 = new Uplet(relation1);
         
-        uplet1.setValeur(0, 2);
-        uplet1.setValeur(1, false);
-        uplet1.setValeur(2, "Alice");
+        // uplet1.setValeur(0, 2);
+        // uplet1.setValeur(1, false);
+        // uplet1.setValeur(2, "Alice");
 
-        relation1.insert(uplet1, uplet2);
+        // relation1.insert(uplet1, uplet2);
 
-        relation2.insert(uplet1Rdeux, uplet2Rdeux);
-        relation2.display();
+        // relation2.insert(uplet1Rdeux, uplet2Rdeux);
+        // relation2.display();
 
-        System.out.println();
+        // System.out.println();
 
-        Relation UnionResultat = relation1.difference(relation2);
+        // Relation UnionResultat = relation1.difference(relation2);
         
-        Uplet upletUnUnion = new Uplet(UnionResultat);
+        // Uplet upletUnUnion = new Uplet(UnionResultat);
 
-        upletUnUnion.setValeur(0, 30);
-        upletUnUnion.setValeur(1, "Alice");
+        // upletUnUnion.setValeur(0, 30);
+        // upletUnUnion.setValeur(1, "Alice");
 
-        UnionResultat.insert(upletUnUnion);
+        // UnionResultat.insert(upletUnUnion);
         
-        UnionResultat.display();
+        // UnionResultat.display();
 
         
 

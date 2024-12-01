@@ -1,3 +1,4 @@
+package mypackage;
 import java.util.*;
 
 public class Relation {
@@ -333,7 +334,7 @@ public class Relation {
         }
     }
     
-    private Uplet combinerUplets(Uplet uplet1, Uplet uplet2, int colonneIgnorée, Relation relation) {
+    private Uplet combinerUplets(Uplet uplet1, Uplet uplet2, int colonneIgnoree, Relation relation) {
         Uplet nouveauUplet = new Uplet(relation);
         int index = 0;
     
@@ -342,7 +343,7 @@ public class Relation {
         }
     
         for (int i = 0; i < uplet2.getLigne().size(); i++) {
-            if (i != colonneIgnorée) {
+            if (i != colonneIgnoree) {
                 nouveauUplet.setValeur(index++, uplet2.getValeur(i));
             }
         }
