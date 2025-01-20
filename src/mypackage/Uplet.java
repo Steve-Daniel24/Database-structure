@@ -1,4 +1,5 @@
 package mypackage;
+
 import java.util.*;
 
 public class Uplet {
@@ -80,4 +81,29 @@ public class Uplet {
         Uplet uplet = (Uplet) obj;
         return Objects.equals(valeur, uplet.valeur);
     }
+
+    public Uplet fusion(Uplet autre) {
+        // Vérifier que les relations sont compatibles pour une fusion
+        List<Attribut> attributsNouvelleRelation = new ArrayList<>(this.relation.getListColonne());
+        attributsNouvelleRelation.addAll(autre.getRelation().getListColonne());
+
+        Relation relationFusion = new Relation(
+                "Fusion_" + this.relation.getName() + "_" + autre.getRelation().getName(),
+                attributsNouvelleRelation.toArray(new Attribut[0]));
+
+        Uplet upletFusion = new Uplet(relationFusion);
+
+        // Ajouter les valeurs de cet uplet
+        for (int i = 0; i < this.valeur.size(); i++) {
+            upletFusion.setValeur(i, this.getValeur(i));
+        }
+
+        // Ajouter les valeurs de l'autre uplet
+        for (int j = 0; j < autre.getLigne().size(); j++) {
+            upletFusion.setValeur(this.valeur.size() + j, autre.getValeur(j));
+        }
+
+        return upletFusion;
+    }
+
 }

@@ -1,4 +1,3 @@
-import mypackage.*;
 import java.util.*;
 
 import mypackage.Attribut;
@@ -8,46 +7,112 @@ import mypackage.Uplet;
 
 public class App {
     public static void main(String[] args) {
-    
-        Domaine domaineId = new Domaine(Arrays.asList(1, 2, 3));    
-        Domaine domaineUn = new Domaine(Arrays.asList("Steve", false, 30));
-        Domaine domaineDeux = new Domaine(Arrays.asList("Alice", true, 20));
 
-        Attribut attributId = new Attribut("Id", domaineId);
-        Attribut attributNom = new Attribut("Attribut1R1", domaineUn);
-        Attribut attributAge = new Attribut("Attribut2R1", domaineDeux);
+        Domaine domaineNom = new Domaine(Arrays.asList("Dupont", "Durant", "Martin", null));
+        Domaine domainePrenom = new Domaine(Arrays.asList("Pierres", "Jean", "Georges", null));
+        Domaine domaineId = new Domaine(Arrays.asList(20, 30, 40, null));
+        Domaine domaineNomVoiture = new Domaine(Arrays.asList("Tesla", "Citroen", "Ford" ,null));
+        Domaine domaineModele = new Domaine(Arrays.asList("Modele X","CV" , "2 CV", "3 CV", null));
 
-        Relation relation1 = new Relation("Relation1", attributId, attributNom, attributAge);
-        
-        Uplet uplet1 = new Uplet(relation1);
+        Attribut Nom = new Attribut("Nom", domaineNom);
+        Attribut Prenom = new Attribut("Prenom", domainePrenom);
+        Attribut Id = new Attribut("Id", domaineId);
+        Attribut NomVoiture = new Attribut("NomVoiture", domaineNomVoiture);
+        Attribut ModeleVoiture = new Attribut("Modele", domaineModele);
 
-        uplet1.setValeur(0, 1);
-        uplet1.setValeur(1, "Steve");
+
+        Relation Homme = new Relation("Homme", Nom, Prenom, Id, NomVoiture);
+
+        Uplet uplet1 = new Uplet(Homme);
+
+        uplet1.setValeur(0, "Dupont");
+        uplet1.setValeur(1, "Pierres");
         uplet1.setValeur(2, 20);
+        uplet1.setValeur(3, "Tesla");
 
-        Uplet uplet2 = new Uplet(relation1);
+        Uplet uplet2 = new Uplet(Homme);
 
-        uplet1.setValeur(0, 2);
-        uplet1.setValeur(1, false);
-        uplet1.setValeur(2, "Alice");
+        uplet2.setValeur(0, "Dupont");
+        uplet2.setValeur(1, "Pierres");
+        uplet2.setValeur(2, 20);
+        uplet2.setValeur(3, "Ford");
 
-        relation1.insert(uplet1, uplet2);
+        Uplet uplet3 = new Uplet(Homme);
+
+        uplet3.setValeur(0, "Martin");
+        uplet3.setValeur(1, "Georges");
+        uplet3.setValeur(2, 40);
+        uplet3.setValeur(3, "Tesla");
+
+        Uplet uplet4 = new Uplet(Homme);
+
+        uplet4.setValeur(0, "Durant");
+        uplet4.setValeur(1, "Jean");
+        uplet4.setValeur(2, 20);
+        uplet4.setValeur(3, "Ford");
+
+        Homme.insert(uplet1, uplet2, uplet3, uplet4);
 
         System.out.println("Avant la sélection:");
-        relation1.display();
+        Homme.display();
 
-        System.out.println();
+        // Voiture
+        Relation Voiture = new Relation("Voiture", NomVoiture);
 
-        // Relation selectedRelation = relation1.selection("(Attribut1R1 = '30') or (Attribut2R1 = 'Alice')");
+        Uplet uplet1Voiture = new Uplet(Voiture);
+
+        uplet1Voiture.setValeur(0, "Tesla");
+
+        Uplet uplet2Voiture = new Uplet(Voiture);
+
+        uplet2Voiture.setValeur(0, "Ford");
+        // Uplet uplet3Voiture = new Uplet(Voiture);
+
+        // uplet3Voiture.setValeur(0, "Citroen");
+        // uplet3Voiture.setValeur(1, "3 CV");
+        // uplet3Voiture.setValeur(2, null);
+
+        Voiture.insert(uplet1Voiture, uplet2Voiture);
+        Voiture.display();
+
+        Relation division = Homme.Division(Voiture);
+        division.display();
+
+        // Relation produitCartesien = Homme.produitCartesien(Voiture);
+        // System.out.println("Produits cartesien");
+        // produitCartesien.display();
+
+        // Relation jointureGauche = Homme.jointureExterneGaucheRelation(Voiture, "Nom", "=", "Nom");
+        // System.out.println("Jointure Gauche");
+        // jointureGauche.display();
+
+        // Relation jointureDroite = Homme.jointureExterneDroiteRelation(Voiture, "Nom", "=", "Nom");
+        // System.out.println("Jointure Droite");
+        // jointureDroite.display();
+
+        // Relation jointureExterne = Homme.jointureExterneRelation(Voiture, "Nom", "=", "Nom");
+        // System.out.println("Jointure externe");
+        // jointureExterne.display();
+
+        // Relation jointure = Homme.jointureRelation(Voiture, "Nom", "=", "Nom");
+        // System.out.println("Jointure");
+        // jointure.display();
+
+        // Relation selectedRelation = Homme.jointureCondition(Voiture, "(this.Nom = Voiture.Nom) and (this.Id = 20)");
+        // System.out.println("Jointure mutli-condition");
+        // selectedRelation.display();
 
         // System.out.println("\nAprès la sélection:");
         // selectedRelation.display();
 
         // Domaine domaineUnRelationDeux = new Domaine(Arrays.asList("John", true, 30));
-        // Domaine domaineDeuxRelationDeux = new Domaine(Arrays.asList("Steve", false, 20));
+        // Domaine domaineDeuxRelationDeux = new Domaine(Arrays.asList("Steve", false,
+        // 20));
 
-        // Attribut attributNomDeux = new Attribut("Attribut1R2", domaineUnRelationDeux);
-        // Attribut attributAgeDeux = new Attribut("Attribut2R2", domaineDeuxRelationDeux);
+        // Attribut attributNomDeux = new Attribut("Attribut1R2",
+        // domaineUnRelationDeux);
+        // Attribut attributAgeDeux = new Attribut("Attribut2R2",
+        // domaineDeuxRelationDeux);
 
         // Uplet uplet1 = new Uplet(relation1);
 
@@ -56,7 +121,7 @@ public class App {
         // uplet1.setValeur(2, 20);
 
         // Uplet uplet2 = new Uplet(relation1);
-        
+
         // uplet1.setValeur(0, 2);
         // uplet1.setValeur(1, false);
         // uplet1.setValeur(2, "Alice");
@@ -69,28 +134,25 @@ public class App {
         // System.out.println();
 
         // Relation UnionResultat = relation1.difference(relation2);
-        
+
         // Uplet upletUnUnion = new Uplet(UnionResultat);
 
         // upletUnUnion.setValeur(0, 30);
         // upletUnUnion.setValeur(1, "Alice");
 
         // UnionResultat.insert(upletUnUnion);
-        
+
         // UnionResultat.display();
 
-        
-
-
-        // Relation UnionResultat = 
+        // Relation UnionResultat =
 
         //
         // String condition = "(Nom = 10)";
         // String TestSplit = condition.trim().replaceAll("[()]", "");
-        
+
         // System.out.println("Avant trim : " + condition);
         // System.out.println("Apres trim : " + TestSplit);
-    
+
         // String[] splitTest = TestSplit.split(" ");
 
         // System.out.println("split [0] : " + splitTest[0]);
@@ -98,10 +160,6 @@ public class App {
         // System.out.println("split [2] : " + splitTest[2]);
     }
 }
-
-
-
-
 
 // ArrayList<Uplet> cenSelection = CEN.selection("IdEtudiants", "=", "300")
 // ArrayList<Uplet> cenSelection = CEN.selection("(IdEtudiants = 300) and
@@ -113,22 +171,6 @@ public class App {
 // Raha manao union entre domaine dia oh domaine colone 1 :"12 true rasoa" et
 // domaine col 2 table hafa "3 false rabe " dia manao union entre izy roa ny
 // domaine col vaovao
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Domaine varchar = new Domaine("Varchar", 50);
 // Domaine number = new Domaine("Number", 50);
